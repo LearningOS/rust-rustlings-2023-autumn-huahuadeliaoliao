@@ -8,5 +8,6 @@
 // I AM NOT DONE
 
 fn main() {
-    println!("Hello {}!");
+    let h = "World";
+    println!("Hello {h}!");
 }
