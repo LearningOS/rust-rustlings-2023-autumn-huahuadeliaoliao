@@ -21,7 +21,6 @@
 //
 // Execute `rustlings hint arc1` or use the `hint` watch subcommand for a hint.
 
-// I AM NOT DONE
 
 #![forbid(unused_imports)] // Do not change this, (or the next) line.
 use std::sync::Arc;
@@ -29,16 +28,26 @@ use std::thread;
 
 fn main() {
     let numbers: Vec<_> = (0..100u32).collect();
-    let shared_numbers = // TODO
+    let shared_numbers = Arc::new(numbers);
+
     let mut joinhandles = Vec::new();
 
     for offset in 0..8 {
-        let child_numbers = // TODO
+        let shared_numbers = Arc::clone(&shared_numbers);
         joinhandles.push(thread::spawn(move || {
-            let sum: u32 = child_numbers.iter().filter(|&&n| n % 8 == offset).sum();
+            let chunk_size = shared_numbers.len() / 8;
+            let start = offset * chunk_size;
+            let end = if offset == 7 {
+                shared_numbers.len()
+            } else {
+                (offset + 1) * chunk_size
+            };
+            let chunk = &shared_numbers[start..end];
+            let sum: u32 = chunk.iter().sum();
             println!("Sum of offset {} is {}", offset, sum);
         }));
     }
+    
     for handle in joinhandles.into_iter() {
         handle.join().unwrap();
     }
